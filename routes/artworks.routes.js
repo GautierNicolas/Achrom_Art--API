@@ -5,11 +5,11 @@ const {createOne, deleteOne, getAll, getOne, updateOne} = require('../controller
 router
     .route('/')
     .get(getAll)
+    .post(createOne)
 
 router
     .route('/:id')
     .get(getOne)
-    .post(createOne)
     .put(updateOne)
     .delete(deleteOne)
 

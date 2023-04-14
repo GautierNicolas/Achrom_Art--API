@@ -8,11 +8,17 @@ router
     .get(artistController.getAll)
 
 router
-    .route('/login')
+    .route('/:id')
+    .get(artistController.getOne)
+    .put(artistController.updateOne)
+    .delete(artistController.deleteOne)
+
+router
+    .route('/auth/login')
     .post(authController.login)
 
 router
-    .route('/signup')
+    .route('/auth/register')
     .post(authController.signup)
 
-module.exports = router;
+module.exports = router

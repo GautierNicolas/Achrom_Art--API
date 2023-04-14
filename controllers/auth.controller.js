@@ -41,10 +41,9 @@ exports.login = (req, res) => {
 }
 
 exports.signup = (req, res) => {
-    // 1. on récupère le password dans le body et on le hash .then()
     bcrypt.hash(req.body.password, 10)
         .then(hash => {
-            return ArtistModel.create({
+            return ArtistsModel.create({
                 artist_name: req.body.artist_name,
                 password: hash
             }).then((userCreated) => {
@@ -77,14 +76,13 @@ exports.protect = (req, res, next) => {
     } catch (err) {
         const message = "Jeton invalide"
         return res.status(403).json({message, data: err})
-    }
-    
+    }    
     return next();
 }
 
 exports.restrictTo = (...roles) => {
     return (req, res, next) => {
-        ArtistModel.findByPk(req.userId)
+        ArtistsModel.findByPk(req.userId)
             .then(user => { 
                 console.log(user.artist_name, user.id, roles) 
                 if(!user || !roles.every(role => user.roles.includes(role))){
