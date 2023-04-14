@@ -1,16 +1,16 @@
 const { Op, UniqueConstraintError, ValidationError } = require('sequelize');
-const { ArtistModel, ArtworksModel } = require('../db/sequelize')
+const { ArtistsModel, ArtworksModel } = require('../db/sequelize')
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
 const privateKey = require('../auth/private_key')
 
 exports.login = (req, res) => {
-    if(!req.body.username || !req.body.password){
+    if(!req.body.artist_name || !req.body.password){
         const msg = "Veuillez fournir un nom d'utilisateur et un mot de passe."
         return res.status(400).json({message: msg})
     }
     
-    ArtistModel.findOne({ where : {username: req.body.username}})
+    ArtistsModel.findOne({ where : {artist_name: req.body.artist_name}})
         .then(user => {
             if(!user){
                 const msg = "L'utilisateur demandé n'existe pas."
@@ -45,10 +45,10 @@ exports.signup = (req, res) => {
     bcrypt.hash(req.body.password, 10)
         .then(hash => {
             return ArtistModel.create({
-                username: req.body.username,
+                artist_name: req.body.artist_name,
                 password: hash
             }).then((userCreated) => {
-                const message = `L'utilisateur ${userCreated.username} a bien été créé` 
+                const message = `L'utilisateur ${userCreated.artist_name} a bien été créé` 
                 userCreated.password = 'hidden';
                 return res.json({message, data: userCreated})
             })
@@ -86,7 +86,7 @@ exports.restrictTo = (...roles) => {
     return (req, res, next) => {
         ArtistModel.findByPk(req.userId)
             .then(user => { 
-                console.log(user.username, user.id, roles) 
+                console.log(user.artist_name, user.id, roles) 
                 if(!user || !roles.every(role => user.roles.includes(role))){
                     const message = "Droits insuffisants";
                     return res.status(403).json({message}) 

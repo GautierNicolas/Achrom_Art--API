@@ -1,4 +1,5 @@
 const { Sequelize, DataTypes} = require('sequelize')
+const bcrypt = require('bcrypt')
 const ArtistsModelSequelize = require('../models/artists')
 const ArtworksModelSequelize = require('../models/artworks')
 const MessagesModelSequelize = require('../models/contact')
@@ -32,7 +33,6 @@ CategoriesModel.belongsToMany(ArtworksModel, {through: 'artworks_categories'})
 ArtistsModel.belongsToMany(CountriesModel, {through: 'artists_Countries'})
 CountriesModel.belongsToMany(ArtistsModel, {through: 'artists_Countries'})
 
-
 // Initialisation de la base de donnée
 const initDb = () => {
     return sequelize.sync()
@@ -43,7 +43,26 @@ const initDb = () => {
 sequelize
     .authenticate()
     .then(() =>
-        console.log(`La connection à la base de donnée est établie`)
+    console.log("La base est bien authentifié")
+    //     bcrypt.hash('mdp', 10)
+    //       .then((hash) => {
+    //           ArtistsModel.create({
+    //               artist_name: 'paul',
+    //               password: hash,
+    //               roles: ['artist', 'admin']
+    //           })
+    //       })
+    //       .catch(err => console.log(err))
+    //     ,
+    //     bcrypt.hash('mdp', 10)
+    //     .then((hash) => {
+    //         ArtistsModel.create({
+    //             artist_name: 'pierre',
+    //             password: hash,
+    //             roles: ['artist']
+    //         })
+    //     })
+    //   .catch(err => console.log(err))
     )
     .catch((error) =>
         console.error(`Impossible de se connecter à la base de donnée ${error}`)

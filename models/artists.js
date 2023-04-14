@@ -22,7 +22,7 @@ module.exports = (sequelize, DataTypes) =>
       },
       email: {
         type: DataTypes.STRING,
-        allowNull: false,
+        allowNull: true,
         unique: {
           msg: 'Cet email est déjà utilisé',
         },
@@ -67,11 +67,11 @@ module.exports = (sequelize, DataTypes) =>
       },
       name: {
         type: DataTypes.STRING,
-        allowNull: false,
+        allowNull: true,
       },
       first_name: {
         type: DataTypes.STRING,
-        allowNull: false,
+        allowNull: true,
       },
       biography: {
         type: DataTypes.STRING,
@@ -83,7 +83,7 @@ module.exports = (sequelize, DataTypes) =>
       },
       birth_date: {
         type: DataTypes.DATE,
-        allowNull: false,
+        allowNull: true,
       },
       view_count: {
         type: DataTypes.INTEGER,
