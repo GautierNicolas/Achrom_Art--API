@@ -1,13 +1,29 @@
-const express = require('express');
-const app = express();
+const express = require('express')
+const morgan = require('morgan')
+// const serveFavicon = require('serve-favicon')
+const sequelize = require('./db/sequelize')
 
-const port = 3000;
+const app = express()
+const port = 3000
 
-// respond with "hello world" when a GET request is made to the homepage
-app.get('/', function (req, res) {
-    res.send('hello world');
-});
+sequelize.initDb()
 
-app.listen(port, () => console.log(
-	`Notre application Node est démarrée sur : http://localhost:${port}`)
-)
+// Middleware
+app
+    .use(morgan('dev'))
+    .use(express.json())
+    // .use(serveFavicon(__dirname + '/favicon.ico'))
+
+// Routes
+const artistsRouter = require('./routes/artists.routes')
+const artworksRouter = require('./routes/artworks.routes')
+const contactRouter = require('./routes/contact.routes')
+
+app
+    .use('/api/artists', artistsRouter)
+    .use('/api/artworks', artworksRouter)
+    .use('/api/contact', contactRouter)
+
+app.listen(port, () => {
+    console.log(`L'application ecoute le port ${port}`)
+})
