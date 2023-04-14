@@ -3,7 +3,7 @@ const artistRoles = ['artist', 'admin', 'superadmin']
 module.exports = (sequelize, DataTypes) =>
   sequelize.define('artists', {
       id: {
-        type: DataTypes.INTEGER.UNSIGNED,
+        type: DataTypes.INTEGER,
         primaryKey: true,
         autoIncrement: true,
         allowNull: false,

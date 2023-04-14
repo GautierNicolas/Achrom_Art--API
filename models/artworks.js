@@ -1,7 +1,7 @@
 module.exports = (sequelize, DataTypes) =>
   sequelize.define('artworks', {
     id: {
-      type: DataTypes.INTEGER.UNSIGNED,
+      type: DataTypes.INTEGER,
       primaryKey: true,
       autoIncrement: true,
       allowNull: false,
