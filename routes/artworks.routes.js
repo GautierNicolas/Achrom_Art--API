@@ -1,11 +1,11 @@
 const express = require('express')
 const router = express()
 const {createOne, deleteOne, getAll, getOne, updateOne} = require('../controllers/artworks.controller')
-
+const {protect, restrictTo} = require('../middlewares/auth.middleware')
 router
     .route('/')
     .get(getAll)
-    .post(createOne)
+    .post(protect, createOne)
 
 router
     .route('/:id')

@@ -1,11 +1,13 @@
 const { Op, ValidationError, UniqueConstraintError } = require('sequelize')
-const {ArtworksModel, ArtistsModel, CategoriesModel} = require('../db/sequelize')
+const {ArtworkModel, ArtistModel, CategorieModel} = require('../db/sequelize')
+const {protectId, restrictTo} = require('../controllers/auth.controller')
+
 
 
 // Récupérer toutes les oeuvres
 exports.getAll = (req, res) => {
-  ArtworksModel.findAll({
-    include: [ArtistsModel.scope("withoutPassword"), CategoriesModel]
+  ArtworkModel.findAll({
+    include: [ArtistModel.scope("withoutPassword"), CategorieModel]
   })
   .then((results) => {
     const msg = "La liste des artworks a bien été trouvé"
@@ -19,8 +21,8 @@ exports.getAll = (req, res) => {
 
 // Récupérer une oeuvre
 exports.getOne = (req, res) => {
-  ArtworksModel.findByPk(req.params.id, {
-    include: [ArtistsModel.scope("withoutPassword"), CategoriesModel]
+  ArtworkModel.findByPk(req.params.id, {
+    include: [ArtistModel.scope("withoutPassword"), CategorieModel]
   })
   .then((artworks) => {
     if(artworks === null) {
@@ -38,27 +40,33 @@ exports.getOne = (req, res) => {
 }
 
 // Créer une oeuvre
-exports.createOne = (req, res) => {
-  const { body } = req
-  ArtworksModel.create(body)
+exports.createOne = (req, res) => {  
+  ArtworkModel.create(req.body)
     .then((artwork) => {
-      res.status(201).json({ msg: "L'oeuvre a bien été créée", artwork })
+      if(artwork === null) {
+        const msg = "L'artworks n'est pas conforme"
+        res.status(404).json({ msg })
+      } else {
+          artwork.addArtists(req.headers.userid)
+          const msg = "L'oeuvre a bien été créée"
+          res.status(201).json({ msg, artwork })
+      }
     })
     .catch((error) => {
       if (
         error instanceof ValidationError ||
         error instanceof UniqueConstraintError
       ) {
-        res.status(400).json({ message: error.message })
-      } else {
-        res.status(500).json({ error: error.message })
-      }
+        return res.status(400).json({ message: error.message, data: error })
+      } 
+      const msg = "Impossible de créer l'artworks"
+        res.status(500).json({ msg, message: error.message, data: error })
     })
 }
 
 //  Modifier une oeuvre
 exports.updateOne = (req, res) => {
-  ArtworksModel.update(req.body, {
+  ArtworkModel.update(req.body, {
     where: {
       id: req.params.id,
     }
@@ -86,7 +94,7 @@ exports.updateOne = (req, res) => {
 // Supprimer une oeuvre
 exports.deleteOne = (req, res) => {
   const { id } = req.params
-  ArtworksModel.destroy({ where: { id } })
+  ArtworkModel.destroy({ where: { id } })
     .then((ressource) => {
       if (ressource === 0)
         return res.status(404).json({ error: "L'oeuvre n'existe pas" })

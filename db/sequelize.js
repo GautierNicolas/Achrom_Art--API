@@ -1,10 +1,10 @@
 const { Sequelize, DataTypes} = require('sequelize')
 const bcrypt = require('bcrypt')
-const ArtistsModelSequelize = require('../models/artists')
-const ArtworksModelSequelize = require('../models/artworks')
-const MessagesModelSequelize = require('../models/contact')
-const CategoriesModelSequelize = require('../models/categories')
-const CountriesModelSequelize = require('../models/countries')
+const ArtistModelSequelize = require('../models/artists')
+const ArtworkModelSequelize = require('../models/artworks')
+const MessageModelSequelize = require('../models/contact')
+const CategorieModelSequelize = require('../models/categories')
+const CountrieModelSequelize = require('../models/countries')
 
 // Création de donnée achromart2
 const sequelize = new Sequelize('achromart2', 'root', '', {
@@ -14,24 +14,24 @@ const sequelize = new Sequelize('achromart2', 'root', '', {
 })
 
 // Création de mes tables sur la base de leur modèle Sequelize
-const ArtistsModel = ArtistsModelSequelize(sequelize, DataTypes)
-const ArtworksModel = ArtworksModelSequelize(sequelize, DataTypes)
-const MessagesModel = MessagesModelSequelize(sequelize, DataTypes)
-const CategoriesModel = CategoriesModelSequelize(sequelize, DataTypes)
-const CountriesModel = CountriesModelSequelize(sequelize, DataTypes)
+const ArtistModel = ArtistModelSequelize(sequelize, DataTypes)
+const ArtworkModel = ArtworkModelSequelize(sequelize, DataTypes)
+const MessageModel = MessageModelSequelize(sequelize, DataTypes)
+const CategorieModel = CategorieModelSequelize(sequelize, DataTypes)
+const CountrieModel = CountrieModelSequelize(sequelize, DataTypes)
 
 // Définition des relations
 // Artworks / Artists many to many
-ArtistsModel.belongsToMany(ArtworksModel, {through: 'artworks_artists'})
-ArtworksModel.belongsToMany(ArtistsModel, {through: 'artworks_artists'})
+ArtistModel.belongsToMany(ArtworkModel, {through: 'artworks_artists'})
+ArtworkModel.belongsToMany(ArtistModel, {through: 'artworks_artists'})
 
 // Artworks / Categories many to many
-ArtworksModel.belongsToMany(CategoriesModel, {through: 'artworks_categories'})
-CategoriesModel.belongsToMany(ArtworksModel, {through: 'artworks_categories'})
+ArtworkModel.belongsToMany(CategorieModel, {through: 'artworks_categories'})
+CategorieModel.belongsToMany(ArtworkModel, {through: 'artworks_categories'})
 
 // Artists / Countries many to many
-ArtistsModel.belongsToMany(CountriesModel, {through: 'artists_Countries'})
-CountriesModel.belongsToMany(ArtistsModel, {through: 'artists_Countries'})
+ArtistModel.belongsToMany(CountrieModel, {through: 'artists_Countries'})
+CountrieModel.belongsToMany(ArtistModel, {through: 'artists_Countries'})
 
 // Initialisation de la base de donnée
 const initDb = () => {
@@ -46,7 +46,7 @@ sequelize
     console.log("La base est bien authentifié")
     //     bcrypt.hash('mdp', 10)
     //       .then((hash) => {
-    //           ArtistsModel.create({
+    //           ArtistModel.create({
     //               artist_name: 'paul',
     //               password: hash,
     //               roles: ['artist', 'admin']
@@ -56,7 +56,7 @@ sequelize
     //     ,
     //     bcrypt.hash('mdp', 10)
     //     .then((hash) => {
-    //         ArtistsModel.create({
+    //         ArtistModel.create({
     //             artist_name: 'pierre',
     //             password: hash,
     //             roles: ['artist']
@@ -69,9 +69,9 @@ sequelize
     )
 
 module.exports = {
-    ArtistsModel,
-    ArtworksModel,
-    MessagesModel,
-    CategoriesModel,
+    ArtistModel,
+    ArtworkModel,
+    MessageModel,
+    CategorieModel,
     initDb
 }
