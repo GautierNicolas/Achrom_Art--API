@@ -1,9 +1,11 @@
-const { MessagesModel } = require('../db/sequelize')
+const { ValidationError } = require('sequelize')
+const { MessageModel } = require('../db/sequelize')
 
 // Récupérer toutes les messages
 exports.getAll = (req, res) => {
-    MessagesModel.findAll({
+    MessageModel.findAll({
       attributes: { exclude: ['createdAt', 'updatedAt', 'viewCount'] },
+      order: [['id', 'DESC']]
     })
       .then((messages) => {
         res.status(200).json({ msg: 'Voici la liste des messages', messages })
@@ -14,7 +16,7 @@ exports.getAll = (req, res) => {
   // Récupérer une message
   exports.getOne = (req, res) => {
     const { id } = req.params
-    MessagesModel.findByPk(id, {
+    MessageModel.findByPk(id, {
       attributes: { exclude: ['createdAt', 'updatedAt', 'viewCount'] },
     })
       .then((message) => {
@@ -30,22 +32,31 @@ exports.getAll = (req, res) => {
   }
   
   // Créer une message
-  const createOne = (req, res) => {
-    const { body } = req
-    if (error) return res.status(401).json({ error: error.details[0].message })
-  
-    MessagesModel.create(body)
-      .then((message) =>
-        res.status(201).json({ msg: 'Le message a bien été créée', message })
-      )
-      .catch((error) => res.status(500).json({ error: error.message }))
+  exports.createOne = (req, res) => {
+    MessageModel.create(req.body)
+      .then((message) => {
+        if(!message) {
+          const msg = "Le message n'a pas été créée"
+          return res.status(404).json({ msg })
+        } else {
+          const msg = "Le message a bien été créée"
+          return res.status(201).json({ msg, message })
+        }
+      })
+      .catch((error) => {
+        if (error instanceof ValidationError) {
+          return res.status(400).json({ errors: error.errors })
+        }
+        const msg = "Impossible de créer le message"
+        res.status(500).json({ msg, message: error.message, data: error })
+      })      
   }
   
   //  Modifier une message
   exports.updateOne = (req, res) => {
     const { body } = req
     const { id } = req.params
-    MessagesModel.findByPk(id)
+    MessageModel.findByPk(id)
       .then((messages) => {
         if (!messages)
           return res.status(404).json({ error: "Le message n'existe pas" })
@@ -71,12 +82,12 @@ exports.getAll = (req, res) => {
   // Supprimer une message
   exports.deleteOne = (req, res) => {
     const { id } = req.params
-    Messages.destroy({ where: { id } })
-      .then((ressource) => {
-        if (ressource === 0)
+    MessageModel.destroy({ where: { id } })
+      .then((message) => {
+        if (!message)
           return res.status(404).json({ error: "Le message n'existe pas" })
         res.status(200).json({ msg: 'Le message a bien été supprimée' })
       })
-      .catch((error) => res.status(500).json({ error: error.message }))
+      .catch((error) => res.status(500).json({ error: error}))
   }
   

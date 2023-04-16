@@ -1,5 +1,5 @@
-const { Op, UniqueConstraintError, ValidationErrorn } = require('sequelize');
-const { ArtistModel, ArtworkModel } = require('../db/sequelize')
+const { Op, UniqueConstraintError, ValidationError } = require('sequelize');
+const { ArtistModel } = require('../db/sequelize')
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
 const privateKey = require('../auth/private_key')
@@ -8,12 +8,8 @@ exports.login = (req, res) => {
     if(!req.body.artist_name || !req.body.password){
         const msg = "Veuillez fournir un nom d'utilisateur et un mot de passe."
         return res.status(400).json({message: msg})
-    }
-    
-    ArtistModel.findOne(
-        { 
-            where : {artist_name: req.body.artist_name}
-        })
+    }    
+    ArtistModel.findOne({ where : {artist_name: req.body.artist_name}})
         .then(user => {
             if(!user){
                 const msg = "L'utilisateur demandé n'existe pas."
@@ -66,21 +62,21 @@ exports.signup = (req, res) => {
         })
 }                                                 
 
-exports.privilegeAcces = (req, res) => {
-    console.log("protect Middleware" + " " )
-    const authorizationHeader = req.headers.authorization
+// exports.privilegeAcces = (req, res) => {
+//     console.log("protect Middleware" + " " )
+//     const authorizationHeader = req.headers.authorization
     
-    if(!authorizationHeader){
-        const message = "Un jeton est nécessaire pour accéder à la ressource"
-        return res.status(401).json({message})
-    }
-    try {
-        const token = authorizationHeader.split(' ')[1];
-        const decoded = jwt.verify(token, privateKey)
-        return(decoded)
-    } catch (err) {
-        const message = "Jeton invalide"
-        return res.status(403).json({message, data: err})
-    }    
-}
+//     if(!authorizationHeader){
+//         const message = "Un jeton est nécessaire pour accéder à la ressource"
+//         return res.status(401).json({message})
+//     }
+//     try {
+//         const token = authorizationHeader.split(' ')[1];
+//         const decoded = jwt.verify(token, privateKey)
+//         return(decoded)
+//     } catch (err) {
+//         const message = "Jeton invalide"
+//         return res.status(403).json({message, data: err})
+//     }    
+// }
 

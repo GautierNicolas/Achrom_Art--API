@@ -1,5 +1,5 @@
 module.exports = (sequelize, DataTypes) =>
-  sequelize.define('contact', {
+  sequelize.define('message', {
     id: {
       type: DataTypes.INTEGER,
       primaryKey: true,
@@ -12,10 +12,7 @@ module.exports = (sequelize, DataTypes) =>
     },
     email: {
       type: DataTypes.STRING,
-      allowNull: false,
-      validate: {
-        isEmail: true,
-      },
+      allowNull: false
     },
     phone: {
       type: DataTypes.STRING,

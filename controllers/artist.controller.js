@@ -1,6 +1,6 @@
 const bcrypt = require('bcrypt')
 const {ArtistModel, ArtworkModel, CategorieModel} = require('../db/sequelize')
-const protect = require('../controllers/auth.controller')
+const protect = require('./auth.controller')
 const {privilegeAcces} = require('./auth.controller')
 
 const visitor = ['email', 'password', 'roles', 'name', 'first_name', 'birth_date', 'createdAt', 'updatedAt', 'viewCount']
@@ -12,31 +12,16 @@ const admin = ['']
 // artist = accès limité aux données publiques + données privées en relation avec l'artiste
 // admin = accès à toutes les données
 exports.getAll = (req, res) => {
-    const authorization = req.headers.authorization
-    if(authorization == null) {
-        ArtistModel.findAll({
-            exclude: visitor,
-            include: [ArtworkModel]
-        })
-        .then((results) => {            
-            const msg = "La liste des artist a bien été trouvé"
-            res.status(200).json({ msg, data: results })
-        })
-        .catch((error) => {
-            res.status(500).json({ error: error.message })
-        })
-    } else {
-        const roles = privilegeAcces(req, res).roles
-        console.log(roles.every())
-        if(roles.every(role => role !== 'admin')) {
-        res.status(200).json({ msg: 'Voici la liste des artist', artist })
-        }
-        return (
-            console.log
-        )
-    }
+    ArtistModel.scope('withoutPassword').findAll()
+    .then((artist) => {
+        const msg = "La liste des artist a bien été trouvé"
+        res.json({ msg, data: artist })
+    })
+    .catch((error) => {
+        const msg = "La liste des artist n'a pas pu être récupéré"
+        res.status(500).json({ msg, data: error })
+    })
 }
-
 exports.getAllFilter = (req, res) => {
     ArtistModel.findAll({
     attributes: {

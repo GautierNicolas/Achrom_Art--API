@@ -1,10 +1,10 @@
 const { Sequelize, DataTypes} = require('sequelize')
 const bcrypt = require('bcrypt')
-const ArtistModelSequelize = require('../models/artists')
-const ArtworkModelSequelize = require('../models/artworks')
-const MessageModelSequelize = require('../models/contact')
-const CategorieModelSequelize = require('../models/categories')
-const CountrieModelSequelize = require('../models/countries')
+const ArtistModelSequelize = require('../models/artist.model')
+const ArtworkModelSequelize = require('../models/artwork.model')
+const MessageModelSequelize = require('../models/message.model')
+const CategorieModelSequelize = require('../models/categorie.model')
+const CountrieModelSequelize = require('../models/countrie.model')
 
 // Création de donnée achromart2
 const sequelize = new Sequelize('achromart2', 'root', '', {

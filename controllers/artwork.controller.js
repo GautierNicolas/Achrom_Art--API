@@ -1,20 +1,18 @@
 const { Op, ValidationError, UniqueConstraintError } = require('sequelize')
 const {ArtworkModel, ArtistModel, CategorieModel} = require('../db/sequelize')
-const {protectId, restrictTo} = require('../controllers/auth.controller')
-
-
 
 // Récupérer toutes les oeuvres
 exports.getAll = (req, res) => {
   ArtworkModel.findAll({
-    include: [ArtistModel.scope("withoutPassword"), CategorieModel]
+    include: [ArtistModel, CategorieModel],
+    order: [['id', 'DESC']]
   })
-  .then((results) => {
-    const msg = "La liste des artworks a bien été trouvé"
-    res.json({ msg, data: results })
+  .then((artwork) => {
+    const msg = "La liste des artwork a bien été trouvé"
+    res.json({ msg, data: artwork })
   })
   .catch((error) => {
-    const msg = "La liste des artworks n'a pas pu être récupéré"
+    const msg = "La liste des artwork n'a pas pu être récupéré"
     res.status(500).json({ msg, data: error })
   })
 }
@@ -24,17 +22,18 @@ exports.getOne = (req, res) => {
   ArtworkModel.findByPk(req.params.id, {
     include: [ArtistModel.scope("withoutPassword"), CategorieModel]
   })
-  .then((artworks) => {
-    if(artworks === null) {
-      const msg = "L'artworks n'existe pas"
+  .then((artwork) => {
+    if(artwork == null) {
+      const msg = "L'artwork n'existe pas"
       res.status(404).json({ msg })
     } else {
-      const msg = "L'artworks à bien été récupéré"
-      res.json({ msg, data: results })
+      const msg = "L'artwork à bien été récupéré"
+      res.json({ msg, data: artwork })
     }
   })
   .catch(error => {
-    const msg = "L'artworks n'a pas pu être récuépré"
+    console.log(error)
+    const msg = "L'artwork n'a pas pu être récuépré"
     res.status(500).json({msg, data: error})
   })
 }
@@ -44,7 +43,7 @@ exports.createOne = (req, res) => {
   ArtworkModel.create(req.body)
     .then((artwork) => {
       if(artwork === null) {
-        const msg = "L'artworks n'est pas conforme"
+        const msg = "L'artwork n'est pas conforme"
         res.status(404).json({ msg })
       } else {
           artwork.addArtists(req.headers.userid)
@@ -59,7 +58,7 @@ exports.createOne = (req, res) => {
       ) {
         return res.status(400).json({ message: error.message, data: error })
       } 
-      const msg = "Impossible de créer l'artworks"
+      const msg = "Impossible de créer l'artwork"
         res.status(500).json({ msg, message: error.message, data: error })
     })
 }
@@ -71,13 +70,13 @@ exports.updateOne = (req, res) => {
       id: req.params.id,
     }
   })
-    .then((artworks) => {
-      if(artworks === null) {
+    .then((artwork) => {
+      if(artwork === null) {
         const msg = "L'oeuvre demandé n'existe pas."
         res.json({message: msg})
       } else {
         const msg = "L'oeuvre à bien été modifié."
-        res.json({ message: msg, data: artworks })
+        res.json({ message: msg, data: artwork })
       }
     })
     .catch((error) => {
@@ -86,21 +85,31 @@ exports.updateOne = (req, res) => {
       ) {
         return res.status(400).json({ message: error.message, data: error })
       }
-      const msg = "Impossible de mettre à jour l'artworks"
+      const msg = "Impossible de mettre à jour l'artwork"
       res.status(500).json({ message: msg })
   })
 }
 
 // Supprimer une oeuvre
 exports.deleteOne = (req, res) => {
-  const { id } = req.params
-  ArtworkModel.destroy({ where: { id } })
-    .then((ressource) => {
-      if (ressource === 0)
-        return res.status(404).json({ error: "L'oeuvre n'existe pas" })
-      res.status(200).json({ msg: "L'oeuvre a bien été supprimée" })
-    })
-    .catch((error) => res.status(500).json({ error: error.message }))
+  ArtworkModel.findByPk(req.params.id)
+  .then(artwork => {
+      if (artwork === null) {
+          const message = `Le artwork demandé n'existe pas.`
+          return res.status(404).json({ message })
+      }
+      return ArtworkModel.destroy({
+          where: {
+              id: req.params.id
+          }
+      })
+          .then(() => {
+              const message = `Le artwork ${artwork.name} a bien été supprimé.`
+              res.json({ message, data: artwork });
+          })
+  })
+  .catch(error => {
+      const message = `Impossible de supprimer le artwork.`
+      res.status(500).json({ message, data: error })
+  })
 }
-
-

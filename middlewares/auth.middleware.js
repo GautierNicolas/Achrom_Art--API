@@ -1,13 +1,17 @@
 // Protège les routes en vérifiant la présence d'un jeton JWT valide
+const jwt = require('jsonwebtoken')
+const privateKey = require('../auth/private_key')
+
 exports.protect = (req, res, next) => {
         const authorizationHeader = req.headers.authorization
-
+        console.log("protect Middleware" + " " + authorizationHeader)
     if(!authorizationHeader){
         const msg = "Un jeton est nécessaire pour accéder à la ressource"
         return res.status(401).json({msg})
     }
     try {
         const token = authorizationHeader.split(' ')[1]
+        console.log("token" + " " + token)
         const decoded = jwt.verify(token, privateKey)
         req.userId = decoded.data
     } catch (err) {

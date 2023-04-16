@@ -1,10 +1,11 @@
 const express = require('express')
 const router = express()
-const { deleteOne, getAll, getOne, updateOne } = require('../controllers/contact.controller')
+const { deleteOne, getAll, getOne, updateOne, createOne } = require('../controllers/message.controller')
 
 router
     .route('/')
     .get(getAll)
+    .post(createOne)
 
 router
     .route('/:id')

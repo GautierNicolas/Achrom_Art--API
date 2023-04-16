@@ -15,14 +15,14 @@ app
     // .use(serveFavicon(__dirname + '/favicon.ico'))
 
 // Routes
-const artistsRouter = require('./routes/artists.routes')
-const artworksRouter = require('./routes/artworks.routes')
-const contactRouter = require('./routes/contact.routes')
+const artistRouter = require('./routes/artist.routes')
+const artworkRouter = require('./routes/artwork.routes')
+const messageRouter = require('./routes/message.routes')
 
 app
-    .use('/api/artists', artistsRouter)
-    .use('/api/artworks', artworksRouter)
-    .use('/api/contact', contactRouter)
+    .use('/api/artists', artistRouter)
+    .use('/api/artworks', artworkRouter)
+    .use('/api/messages', messageRouter)
 
 app.listen(port, () => {
     console.log(`L'application ecoute le port ${port}`)
