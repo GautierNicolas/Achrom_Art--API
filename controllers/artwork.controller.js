@@ -41,24 +41,6 @@ exports.getOne = (req, res) => {
   })
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 // Créer une oeuvre
 exports.createOne = (req, res) => {
   ArtworkModel.create(req.body)
@@ -79,21 +61,6 @@ exports.createOne = (req, res) => {
       res.json("erreur dans le catch ArtworksCreate")
     })
 } 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 //  Modifier une oeuvre
 exports.updateOne = (req, res) => {
