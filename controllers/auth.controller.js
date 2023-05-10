@@ -4,35 +4,35 @@ const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
 const privateKey = require('../auth/private_key')
 
-exports.login = (req, res) => {
+exports.login = (req, res) => {    
+    
     if(!req.body.artist_name || !req.body.password){
         const msg = "Veuillez fournir un nom d'utilisateur et un mot de passe."
         return res.status(400).json({message: msg})
     }    
     ArtistModel.findOne({ where : {artist_name: req.body.artist_name}})
-        .then(user => {
-            if(!user){
+        .then(artist => {
+            if(!artist){
                 const msg = "L'utilisateur demandé n'existe pas."
                 return res.status(404).json({message: msg})
             }
 
-            bcrypt.compare(req.body.password, user.password)
-                .then(isValid => {
-                    if(!isValid){
+            bcrypt.compare(req.body.password, artist.password)
+                .then(isMatch => {
+                    if(!isMatch){
                         const msg = "Le mot de passe est incorrect."
                         return res.status(404).json({message: msg})
-                    }
-                    // json web token
+                    }                    
                     const token = jwt.sign({                        
-                        id : user.id,
-                        artist_name : user.artist_name,
-                        email : user.email,
-                        roles : user.roles                        
-                      }, privateKey, { expiresIn: '5h' });
-
+                        id : artist.id,
+                        artist_name : artist.artist_name,
+                        email : artist.email,
+                        roles : artist.roles                        
+                    }, privateKey, { expiresIn: '5h' });
+                    
+                    artist.password = "hidden"
                     const msg = "L'utilisateur a été connecté avec succès."
-                    user.password = "hidden"
-                    return res.json({message: msg, user, token})
+                    res.status(200).json({ message: msg, data: token })
                 })
         })
         .catch(error => {
@@ -42,15 +42,16 @@ exports.login = (req, res) => {
 }
 
 exports.signup = (req, res) => {
+    console.log("AUTH REGISTER")
+    console.log("------>" + " " + req.body.password)
     bcrypt.hash(req.body.password, 10)
         .then(hash => {
-            return ArtistModel.create({
-                artist_name: req.body.artist_name,
-                password: hash
-            }).then((userCreated) => {
-                const message = `L'utilisateur ${userCreated.artist_name} a bien été créé` 
-                userCreated.password = 'hidden';
-                return res.json({message, data: userCreated})
+            req.body.password = hash
+            return ArtistModel.create(req.body)
+            .then((artistCreated) => {
+                const message = `L'utilisateur ${artistCreated.artist_name} a bien été créé` 
+                artistCreated.password = 'hidden';
+                return res.json({message, data: artistCreated})
             })
         })
         .catch(error => {
@@ -63,7 +64,7 @@ exports.signup = (req, res) => {
 }                                                 
 
 // exports.privilegeAcces = (req, res) => {
-//     console.log("protect Middleware" + " " )
+//     console.log("authentification Middleware" + " " )
 //     const authorizationHeader = req.headers.authorization
     
 //     if(!authorizationHeader){

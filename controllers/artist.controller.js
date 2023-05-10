@@ -1,18 +1,14 @@
-const bcrypt = require('bcrypt')
 const {ArtistModel, ArtworkModel, CategorieModel} = require('../db/sequelize')
-const protect = require('./auth.controller')
-const {privilegeAcces} = require('./auth.controller')
 
-const visitor = ['email', 'password', 'roles', 'name', 'first_name', 'birth_date', 'createdAt', 'updatedAt', 'viewCount']
-const artist = ['email', 'password', 'roles', 'name', 'first_name', 'birth_date', 'createdAt', 'updatedAt', 'viewCount']
-const admin = ['']
 
 // Récupérer tout les Artist
 // visiteur = accès limité aux données publiques
 // artist = accès limité aux données publiques + données privées en relation avec l'artiste
 // admin = accès à toutes les données
 exports.getAll = (req, res) => {
-    ArtistModel.scope('withoutPassword').findAll()
+    ArtistModel.scope('withoutPassword').findAll({
+        include: [ArtworkModel, CategorieModel]
+    })
     .then((artist) => {
         const msg = "La liste des artist a bien été trouvé"
         res.json({ msg, data: artist })
@@ -22,17 +18,6 @@ exports.getAll = (req, res) => {
         res.status(500).json({ msg, data: error })
     })
 }
-exports.getAllFilter = (req, res) => {
-    ArtistModel.findAll({
-    attributes: {
-        exclude: ['email', 'password', 'createdAt', 'updatedAt', 'viewCount'],
-    },
-    })
-    .then((artist) => {
-        res.status(200).json({ msg: 'Voici la liste des artist', artist })
-    })
-    .catch((error) => res.status(500).json({ error: error.message }))
-}
    
 // Récupérer un artist
 exports.getOne = (req, res) => {
@@ -40,12 +25,14 @@ exports.getOne = (req, res) => {
     ArtistModel.findByPk(id, {
     attributes: { exclude: ['createdAt', 'updatedAt', 'viewCount'] },
     })
-    .then((artwork) => {
-        if (!artwork)
-        return res.status(404).json({ error: "l'artist n'existe pas" })
-        artwork.viewCount += 1
-        artwork.save()
-        res.status(200).json({ msg: "Voici l'artist", artwork })
+    .then((artist) => {
+        if (!artist) {
+            return res.status(404).json({ error: "l'artist n'existe pas" })
+        } else {
+            artist.view_count += 1
+            artist.save()
+            res.status(200).json({ msg: "Voici l'artist", artist })
+        }
     })
     .catch((error) => res.status(500).json({ error: error.message }))
 }
@@ -54,7 +41,7 @@ exports.getOne = (req, res) => {
 exports.updateOne = (req, res) => {
     const { body } = req
     const { id } = req.params
-    console.log(id)
+    
     ArtistModel.findByPk(id)
     .then((artist) => {
         if (!artist) {
@@ -72,6 +59,7 @@ exports.updateOne = (req, res) => {
 //  Supprimer une artist
 exports.deleteOne = (req, res) => {
     const { id } = req.params
+
     ArtistModel.findByPk(id)
     .then((artist) => {
         if (!artist) {

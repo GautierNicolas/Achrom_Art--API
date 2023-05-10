@@ -1,17 +1,20 @@
 const express = require('express')
 const morgan = require('morgan')
-// const serveFavicon = require('serve-favicon')
 const sequelize = require('./db/sequelize')
+const cookieParser = require('cookie-parser')
+
+// const serveFavicon = require('serve-favicon')
 
 const app = express()
-const port = 3000
+const port = 3000;
 
-sequelize.initDb()
+sequelize.initDb( { force: false })
 
 // Middleware
 app
     .use(morgan('dev'))
     .use(express.json())
+    .use(cookieParser('secret'))
     // .use(serveFavicon(__dirname + '/favicon.ico'))
 
 // Routes
@@ -24,6 +27,7 @@ app
     .use('/api/artworks', artworkRouter)
     .use('/api/messages', messageRouter)
 
-app.listen(port, () => {
+// Lancement du serveur
+app.listen(3000, () => {
     console.log(`L'application ecoute le port ${port}`)
 })

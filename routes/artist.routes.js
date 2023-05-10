@@ -1,24 +1,25 @@
 const express = require('express');
 const router = express.Router();
-const artistController = require('../controllers/artist.controller')
-const authController = require('../controllers/auth.controller')
+const {getAll, getOne, updateOne, deleteOne} = require('../controllers/artist.controller')
+const {login, signup} = require('../controllers/auth.controller')
+const {authentification, restrictToOwnUser} = require('../middlewares/auth.middleware')
 
 router
     .route('/')
-    .get(artistController.getAll)
+    .get(getAll)
 
 router
     .route('/:id')
-    .get(artistController.getOne)
-    .put(artistController.updateOne)
-    .delete(artistController.deleteOne)
+    .get(getOne)
+    .put(authentification, restrictToOwnUser, updateOne)
+    .delete(authentification, restrictToOwnUser, deleteOne)
 
 router
     .route('/auth/login')
-    .post(authController.login)
+    .post(login)
 
 router
     .route('/auth/register')
-    .post(authController.signup)
+    .post(signup)
 
 module.exports = router

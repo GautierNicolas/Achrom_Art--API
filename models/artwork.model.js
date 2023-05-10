@@ -8,7 +8,7 @@ module.exports = (sequelize, DataTypes) =>
     },
     title: {
       type: DataTypes.STRING,
-      allowNull: false,
+      allowNull: true,
       unique: {
         msg: 'Ce titre est déjà utilisé',
       },
@@ -24,7 +24,7 @@ module.exports = (sequelize, DataTypes) =>
     },
     src: {
       type: DataTypes.STRING,
-      allowNull: false,
+      allowNull: true,
       unique: {
         msg: 'Cette source est déjà utilisé',
       },
@@ -43,3 +43,4 @@ module.exports = (sequelize, DataTypes) =>
       allowNull: true,
     },
   })
+// }

@@ -1,12 +1,15 @@
+const Sequelize = require('sequelize');
+
+// const { v4: uuidv4 } = require('uuid');
 const artistRoles = ['artist', 'admin', 'superadmin']
 
 module.exports = (sequelize, DataTypes) =>
   sequelize.define('artists', {
       id: {
-        type: DataTypes.INTEGER,
+        type: Sequelize.UUID,
         primaryKey: true,
-        autoIncrement: true,
         allowNull: false,
+        defaultValue: Sequelize.UUIDV4
       },
       artist_name: {
         type: DataTypes.STRING,
@@ -30,6 +33,7 @@ module.exports = (sequelize, DataTypes) =>
           notEmpty: {
             msg: 'Veuillez renseigner un email',
           },
+          isEmail: true          
         },
       },
       password: {
@@ -67,11 +71,9 @@ module.exports = (sequelize, DataTypes) =>
       },
       name: {
         type: DataTypes.STRING,
-        allowNull: true,
       },
       first_name: {
         type: DataTypes.STRING,
-        allowNull: true,
       },
       biography: {
         type: DataTypes.STRING,
